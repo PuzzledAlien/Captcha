@@ -11,11 +11,15 @@ namespace Captcha.Controllers
             return View("/Views/Index.cshtml");
         }
 
+        /// <summary>
+        /// 返回验证码图片
+        /// </summary>
+        /// <returns></returns>
         [HttpGet, Route("captcha")]
         public async Task<ActionResult> GetCaptcha()
         {
             var model = await CaptchaFactory.Intance.CreateAsync();
-            Response.Cookies.Append("Captcha",model.Answer);
+            Response.Cookies.Append("Captcha", model.Answer);
             return File(model.Image, model.ContentType);
         }
     }

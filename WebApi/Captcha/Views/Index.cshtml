@@ -23,6 +23,7 @@
     </div>
     <script type="text/javascript">
         function getCookie(name) {
+            //获取Cookie值
             var strCookie = document.cookie;
             var arrCookie = strCookie.split("; ");
             for (var i = 0; i < arrCookie.length; i++) {
@@ -33,6 +34,7 @@
         }
 
         $("#btnCaptcha").click(function () {
+            //调用验证码校验方法
             var answer = encodeURI($("#txtCaptcha").val());
 
             var captcha = encodeURI(getCookie('Captcha'));
