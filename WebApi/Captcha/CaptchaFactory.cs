@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -94,7 +95,7 @@ namespace Captcha
             }
         }
 
-        public async Task<CaptchaInfo> CreateAsync(int charCount = 4, int width = 80, int height = 40)
+        public async Task<CaptchaInfo> CreateAsync(int charCount = 4, int width = 85, int height = 40)
         {
             var model = new CaptchaInfo
             {
@@ -174,6 +175,11 @@ namespace Captcha
     public partial class CaptchaFactory
     {
         /// <summary>
+        /// 使用线程安全字典，实现验证码只能验证一次的功能，防止机器暴力破解验证码
+        /// </summary>
+        private static readonly ConcurrentDictionary<string, DateTime> Dic = new ConcurrentDictionary<string, DateTime>();
+
+        /// <summary>
         /// 比对验证码
         /// </summary>
         /// <param name="model"></param>
@@ -181,6 +187,39 @@ namespace Captcha
         /// <returns></returns>
         public async Task<VerifyResponse> VerifyAsync(VerifyRequest model, int timeOut = 600)
         {
+            //判空
+            if (string.IsNullOrEmpty(model.Answer) || string.IsNullOrEmpty(model.Captcha))
+            {
+                return new VerifyResponse
+                {
+                    Code = 102,
+                    Message = "验证失败"
+                };
+            }
+
+            //一个验证码只能调用一次接口
+            if (Dic.ContainsKey(model.Captcha))
+            {
+                return new VerifyResponse
+                {
+                    Code = 101,
+                    Message = "验证码失效"
+                };
+            }
+
+            //记录第一次调用
+            Dic.TryAdd(model.Captcha, DateTime.Now);
+
+            //清除垃圾数据
+            foreach (var d in Dic)
+            {
+                var day = (d.Value - DateTime.Now).Days;
+                if (day > 1)
+                {
+                    Dic.TryRemove(d.Key, out var date);
+                }
+            }
+
             var captcha = await Des.DecryptAsync(model.Captcha);
             var temp = captcha.Split('|');
             if (!DateTime.TryParse(temp[1], out var dateTime))
