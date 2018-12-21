@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -45,6 +46,7 @@ namespace Captcha
                         {
                             await cs.WriteAsync(temp, 0, temp.Length);
                             await cs.FlushAsync();
+                            cs.Close();
                         }
 
                         return Convert.ToBase64String(ms.ToArray());
@@ -71,6 +73,8 @@ namespace Captcha
                 p.Key = Default.GetBytes(SecretKey);
                 using (var ct = p.CreateDecryptor(p.IV, p.Key))
                 {
+                    val = WebUtility.UrlDecode(val);
+                    val = WebUtility.UrlDecode(val);
                     var temp = Convert.FromBase64String(val);
                     using (var ms = new MemoryStream())
                     {
@@ -78,6 +82,7 @@ namespace Captcha
                         {
                             await cs.WriteAsync(temp, 0, temp.Length);
                             await cs.FlushAsync();
+                            cs.Close();
                         }
                         return Default.GetString(ms.ToArray());
                     }

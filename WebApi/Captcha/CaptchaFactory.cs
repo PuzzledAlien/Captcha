@@ -187,76 +187,87 @@ namespace Captcha
         /// <returns></returns>
         public async Task<VerifyResponse> VerifyAsync(VerifyRequest model, int timeOut = 600)
         {
-            //判空
-            if (string.IsNullOrEmpty(model.Answer) || string.IsNullOrEmpty(model.Captcha))
+            try
             {
+                //判空
+                if (string.IsNullOrEmpty(model.Answer) || string.IsNullOrEmpty(model.Captcha))
+                {
+                    return new VerifyResponse
+                    {
+                        Code = 102,
+                        Message = "验证失败"
+                    };
+                }
+
+                //一个验证码只能调用一次接口
+                if (Dic.ContainsKey(model.Captcha))
+                {
+                    return new VerifyResponse
+                    {
+                        Code = 101,
+                        Message = "验证码失效"
+                    };
+                }
+
+                //记录第一次调用
+                Dic.TryAdd(model.Captcha, DateTime.Now);
+
+                //清除垃圾数据
+                foreach (var d in Dic)
+                {
+                    var day = (d.Value - DateTime.Now).Days;
+                    if (day > 1)
+                    {
+                        Dic.TryRemove(d.Key, out var date);
+                    }
+                }
+
+                var captcha = await Des.DecryptAsync(model.Captcha);
+                var temp = captcha.Split('|');
+                if (!DateTime.TryParse(temp[1], out var dateTime))
+                {
+                    return new VerifyResponse
+                    {
+                        Code = 101,
+                        Message = "验证码失效"
+                    };
+                }
+
+                var sec = (DateTime.Now - dateTime).TotalSeconds;
+
+                if (sec > timeOut)
+                {
+                    return new VerifyResponse
+                    {
+                        Code = 101,
+                        Message = "验证码失效"
+                    };
+                }
+
+                var answer = temp[0];
+                if (string.Equals(answer, model.Answer, StringComparison.CurrentCultureIgnoreCase))
+                {
+                    return new VerifyResponse
+                    {
+                        Code = 100,
+                        Message = "验证成功"
+                    };
+                }
+
                 return new VerifyResponse
                 {
                     Code = 102,
                     Message = "验证失败"
                 };
             }
-
-            //一个验证码只能调用一次接口
-            if (Dic.ContainsKey(model.Captcha))
+            catch (Exception ex)
             {
                 return new VerifyResponse
                 {
-                    Code = 101,
-                    Message = "验证码失效"
+                    Code = -1,
+                    Message = ex.Message
                 };
             }
-
-            //记录第一次调用
-            Dic.TryAdd(model.Captcha, DateTime.Now);
-
-            //清除垃圾数据
-            foreach (var d in Dic)
-            {
-                var day = (d.Value - DateTime.Now).Days;
-                if (day > 1)
-                {
-                    Dic.TryRemove(d.Key, out var date);
-                }
-            }
-
-            var captcha = await Des.DecryptAsync(model.Captcha);
-            var temp = captcha.Split('|');
-            if (!DateTime.TryParse(temp[1], out var dateTime))
-            {
-                return new VerifyResponse
-                {
-                    Code = 101,
-                    Message = "验证码失效"
-                };
-            }
-
-            var sec = (DateTime.Now - dateTime).TotalSeconds;
-
-            if (sec > timeOut)
-            {
-                return new VerifyResponse
-                {
-                    Code = 101,
-                    Message = "验证码失效"
-                };
-            }
-
-            var answer = temp[0];
-            if (string.Equals(answer, model.Answer, StringComparison.CurrentCultureIgnoreCase))
-            {
-                return new VerifyResponse
-                {
-                    Code = 100,
-                    Message = "验证成功"
-                };
-            }
-
-            return new VerifyResponse
-            {
-                Code = 102,
-                Message = "验证失败"
-            };
         }
     }
 }
