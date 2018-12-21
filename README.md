@@ -34,5 +34,7 @@ sudo apt install libgdiplus
  - [Magick.NET](https://github.com/dlemstra/Magick.NET)
  - [SkiaSharp](https://github.com/mono/SkiaSharp)
 
-### 计划2
-尝试.Net Core 2.2，将Captcha独立成.Net Standard类库，并借助微软自带DI解耦CaptchaFactory
+### ~~计划2~~
+~~尝试.Net Core 2.2，将Captcha独立成.Net Standard类库，并借助微软自带DI解耦CaptchaFactory~~
+
+计划2已完成
