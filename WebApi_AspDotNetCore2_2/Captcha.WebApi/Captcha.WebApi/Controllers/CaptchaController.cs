@@ -1,12 +1,19 @@
 ﻿using System.Threading.Tasks;
+using CaptchaService;
+using CaptchaService.Models;
 using Microsoft.AspNetCore.Mvc;
-using Captcha.Models;
 
-namespace Captcha.Controllers
+namespace Captcha.WebApi.Controllers
 {
     [ApiController]
     public class CaptchaController : ControllerBase
     {
+        private readonly ICaptchaFactory _captchaFactory;
+        public CaptchaController(ICaptchaFactory captchaFactory)
+        {
+            _captchaFactory = captchaFactory;
+        }
+
         /// <summary>
         /// 获取验证码
         /// </summary>
@@ -14,7 +21,7 @@ namespace Captcha.Controllers
         [HttpGet, Route("api/captcha")]
         public async Task<CaptchaInfo> GetCaptcha()
         {
-            var model = await CaptchaFactory.Intance.CreateAsync();
+            var model = await _captchaFactory.CreateAsync();
             return model;
         }
 
@@ -26,8 +33,7 @@ namespace Captcha.Controllers
         [HttpPost, Route("api/captcha/verify")]
         public async Task<VerifyResponse> Verify([FromBody] VerifyRequest model)
         {
-            var response = await CaptchaFactory.Intance.VerifyAsync(model);
-
+            var response = await _captchaFactory.VerifyAsync(model);
             return response;
         }
     }
