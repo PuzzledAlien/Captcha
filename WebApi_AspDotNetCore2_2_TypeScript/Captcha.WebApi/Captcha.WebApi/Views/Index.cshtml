@@ -1,0 +1,27 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+    <!--引用微软的压缩版本-->
+    <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-3.3.1.min.js"></script>
+    <div>
+        <input id="txtCaptcha" type="text" style="width: 200px;" /><br>
+        <br>
+        <img id="imgCaptcha" style="cursor: pointer;" src="/captcha" alt="验证码" />
+        <br>
+        <br>
+        <button id="btnCaptcha">提交</button>
+    </div>
+    <script src="~/js/httpService.js" charset="utf-8"></script>
+    <script src="~/js/captcha.js" charset="utf-8"></script>
+</body>
+</html>
