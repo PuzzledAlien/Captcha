@@ -1,8 +1,9 @@
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -33,56 +34,56 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var HttpService = /** @class */ (function () {
-    function HttpService() {
+var _this = this;
+$(document).ready(function () { return __awaiter(_this, void 0, void 0, function () {
+    var _this = this;
+    return __generator(this, function (_a) {
+        $("#btnCaptcha").click(function () { return __awaiter(_this, void 0, void 0, function () {
+            var answer, captcha, request, result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        answer = encodeURI($("#txtCaptcha").val());
+                        captcha = encodeURI(getCookie("Captcha"));
+                        request = {
+                            answer: answer,
+                            captcha: captcha
+                        };
+                        return [4 /*yield*/, verifyAsync(request)];
+                    case 1:
+                        result = _a.sent();
+                        alert("message : " + result.message + ", code : " + result.code);
+                        return [2 /*return*/];
+                }
+            });
+        }); });
+        return [2 /*return*/];
+    });
+}); });
+function verifyAsync(request) {
+    return __awaiter(this, void 0, void 0, function () {
+        var url, result;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    url = "api/captcha/verify";
+                    return [4 /*yield*/, HttpService.instance.postAsync(url, request)];
+                case 1:
+                    result = _a.sent();
+                    return [2 /*return*/, result];
+            }
+        });
+    });
+}
+function getCookie(name) {
+    //获取Cookie值
+    var strCookie = document.cookie;
+    var arrCookie = strCookie.split("; ");
+    for (var i = 0; i < arrCookie.length; i++) {
+        var arr = arrCookie[i].split("=");
+        if (arr[0] === name)
+            return arr[1];
     }
-    HttpService.prototype.getAsync = function (url) {
-        return __awaiter(this, void 0, void 0, function () {
-            var result, e_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, $.ajax(url, { type: "GET" })];
-                    case 1:
-                        result = _a.sent();
-                        return [2 /*return*/, result];
-                    case 2:
-                        e_1 = _a.sent();
-                        alert(e_1);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/, null];
-                }
-            });
-        });
-    };
-    HttpService.prototype.postAsync = function (url, data) {
-        return __awaiter(this, void 0, void 0, function () {
-            var result, e_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, $.ajax({
-                                url: url,
-                                type: "POST",
-                                dataType: "json",
-                                data: JSON.stringify(data),
-                                contentType: 'application/json; charset=utf-8'
-                            })];
-                    case 1:
-                        result = _a.sent();
-                        return [2 /*return*/, result];
-                    case 2:
-                        e_2 = _a.sent();
-                        alert(e_2);
-                        return [3 /*break*/, 3];
-                    case 3: return [2 /*return*/, null];
-                }
-            });
-        });
-    };
-    HttpService.instance = new HttpService();
-    return HttpService;
-}());
-//# sourceMappingURL=httpService.js.map
+    return "";
+}
+//# sourceMappingURL=captcha.js.map
